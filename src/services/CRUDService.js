@@ -95,4 +95,5 @@ module.exports = {
   getAllUser: getAllUser,
   getUserInfoById: getUserInfoById,
   updateUserData: updateUserData,
+
 };
