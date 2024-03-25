@@ -36,7 +36,7 @@ let handleGetAllUsers = async (req, res) => {
             users: []
         })
     }
-    let users = await userService.getAllUsers(id);
+    let users = await userService.getALLUsers(id);
   
     return res.status(200).json({
         errCode: 0,
@@ -72,6 +72,6 @@ module.exports = {
     handleLogin: handleLogin ,
     handleGetAllUsers: handleGetAllUsers,
     handleCreateNewUser: handleCreateNewUser,
-    handleEditUser:     handleEditUser,
+    handleEditUser:  handleEditUser,
     handleDeleteUser: handleDeleteUser
 }
