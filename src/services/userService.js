@@ -161,6 +161,7 @@ let deleteUser = (userId) => {
 let updateUserData = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
+      console.log('check nodejs:', data)
       if (!data.id) {
         resolve({
           errCode: 2,
