@@ -205,7 +205,7 @@ let getAllCodeService = (typeInput) => {
         });
       }
       let res = {};
-      let allCode = await db.AllCode.findAll({
+      let allCode = await db.Allcode.findAll({
         where: { type: typeInput },
       });
       res.errCode = 0;
