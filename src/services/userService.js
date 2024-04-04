@@ -32,23 +32,23 @@ let handleUserLogin = (email, password) => {
           if (check) {
             userData.errCode = 0;
             userData.errMessage = "Ok";
-            console.log(user);
             delete user.password;
             userData.user = user;
           } else {
             userData.errCode = 3;
-            userData.errMessage = `Your password isnt correct. Please try again`;
+            userData.errMessage = `Your password isn't correct. Please try again`;
           }
         } else {
           userData.errCode = 2;
-          userData.errMessage = `User isnt found in the system`;
+          userData.errMessage = `User isn't found in the system`;
         }
       } else {
         userData.errCode = 1;
         userData.errMessage =
-          "Your email isnt exist in the system. Please try again";
+          "Your email isn't exist in the system. Please try again";
       }
       resolve(userData);
+
     } catch (e) {
       reject(e);
     }
