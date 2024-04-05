@@ -5,18 +5,10 @@ const {
 module.exports = (sequelize, DataTypes) => {
     class Markdown extends Model {
         static associate(models) {
-            // Markdown.belongsTo(models.Doctor, {
-            //     foreignKey: "doctorId",
-            //     as: "doctorData"
-            // });
-            // Markdown.belongsTo(models.Specialty, {
-            //     foreignKey: "specialtyId",
-            //     as: "specialtyData"
-            // });
-            // Markdown.belongsTo(models.Clinic, {
-            //     foreignKey: "clinicId",
-            //     as: "clinicData"
-            // });
+         
+            Markdown.belongsTo(models.User, {
+                foreignKey: "doctorId"
+            });
         }
     };
     Markdown.init({
