@@ -7,8 +7,8 @@ let sendSimpleEmail = async (dataSend) => {
     port: 587,
     secure: false,
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
+      user: process.env.EMAIL_APP,
+      pass: process.env.EMAIL_APP_PASSWORD,
     },
   });
 
@@ -22,7 +22,7 @@ let sendSimpleEmail = async (dataSend) => {
 
 let getBodyHTMLEmail = (dataSend) => {
   let result = "";
-  if (dataSend.languge === "vi") {
+  if (dataSend.language  === "vi") {
     result = `
     <h3>Xin chào ${dataSend.patientName}!</h3>
 <p>Bạn nhận được email này vì đã đặt lịch khám bệnh online từ website của chúng tôi medical society.</p>
@@ -33,10 +33,11 @@ let getBodyHTMLEmail = (dataSend) => {
 </p>
 <div>
 <a href=${dataSend.redirectLink} target="_blank" >Click here</a>
+</div>
 <div>Xin cảm ơn</div>
     `;
   }
-  if (dataSend.languge === "en") {
+  if (dataSend.language  === "en") {
     result = `
     <h3>Dear ${dataSend.patientName}</h3>
     <p>You are receiving this email because you have booked an online medical appointment from our medical society website.</p>
@@ -46,12 +47,13 @@ let getBodyHTMLEmail = (dataSend) => {
     <p>If the above information is true, please click on the link below to confirm and complete the medical appointment booking procedure.
     </p>
     <div>
-    <a href=${dataSend.redirectLink} target="_blank" </div>
+    <a href=${dataSend.redirectLink} target="_blank" >Click here</a> </div>
     <div> Sincerely thank!</div>
-    `
+    `;
   }
+  console.log(result);
   return result;
 };
 module.exports = {
   sendSimpleEmail: sendSimpleEmail,
-}
+};

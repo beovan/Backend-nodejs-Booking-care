@@ -100,8 +100,8 @@ let saveDetailInfoDoctor = (inputData) => {
             await doctorMarkdown.save();
           }
         }
-        //upsert to Doctor_infor table
-        let doctorInfo = await db.Doctor_infor.findOne({
+        //upsert to Doctor_Infor table
+        let doctorInfo = await db.Doctor_Infor.findOne({
           where: { doctorId: inputData.doctorId },
           raw: false,
         });
@@ -117,7 +117,7 @@ let saveDetailInfoDoctor = (inputData) => {
           await doctorInfo.save();
         } else {
           //create
-          await db.Doctor_infor.create({
+          await db.Doctor_Infor.create({
             doctorId: inputData.doctorId,
             priceId: inputData.selectedPrice,
             provinceId: inputData.selectedProvince,
