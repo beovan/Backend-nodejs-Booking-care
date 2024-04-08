@@ -1,3 +1,4 @@
+import { lang } from "moment";
 import db from "../models/index";
 require("dotenv").config();
 
@@ -7,7 +8,9 @@ let postBookAppointment = (data) => {
             if (!data.email ||
                  !data.doctorId ||
                   !data.timeType ||
-                   !data.date) {
+                   !data.date ||
+                    !data.fullName 
+                ) {
                     resolve({
                         errCode: 1,
                         errMessage: "Missing required parameter",
@@ -18,9 +21,10 @@ let postBookAppointment = (data) => {
 
                 await emailservice.sendSimpleEmail({
                     reciverEmail: data.email,
-                    patientName: 'Hỏi Dân IT patient name',
-                    time: '8:00-9:00 Chủ nhật 1/8/2021',
-                    doctorName: "ERIC",
+                    patientName: data.fullName,
+                    time: data.timeString,
+                    doctorName: data.doctorName,
+                    languge: data.languge,
                     redirectLink: 'https://www.youtube.com/channel/UCVkBcokjObNZiXavfAE1-fA'
                     })
 
