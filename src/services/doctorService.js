@@ -98,7 +98,6 @@ let saveDetailInfoDoctor = (inputData) => {
           errCode: 1,
           errMessage: `Missing required parameters: ${checkObj.element}` ,
         });
-        console.log;
       } else {
         //upsert to Markdown table
         if (inputData.action === "CREATE") {
@@ -127,6 +126,7 @@ let saveDetailInfoDoctor = (inputData) => {
           where: { doctorId: inputData.doctorId },
           raw: false,
         });
+
         if (doctorInfo) {
           //update
           doctorInfo.doctorId = inputData.doctorId;
