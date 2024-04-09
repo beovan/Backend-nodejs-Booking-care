@@ -57,24 +57,46 @@ let getAllDoctors = () => {
   });
 };
 
+
+let checkRequiredFields = (inputData) => {
+  let arrFields = [
+    "doctorId",
+    "contentHTML",
+    "contentMarkdown",
+    "action",
+    "selectedPrice",
+    "selectedPayment",
+    "selectedProvince",
+    "nameClinic",
+    "addressClinic",
+    "note",
+    "specialtyId",
+  ];
+  let isValid = true;
+  let element = "";
+  for (let i = 0; i < arrFields.length; i++) {
+    if (!inputData[arrFields[i]]) {
+      isValid = false;
+      element = arrFields[i];
+      break;
+    }
+  }
+  return {
+    isValid: isValid,
+    element: element,
+  };
+};
+
 let saveDetailInfoDoctor = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
+      let checkObj = checkRequiredFields(inputData);
       if (
-        !inputData.doctorId ||
-        !inputData.contentHTML ||
-        !inputData.contentMarkdown ||
-        !inputData.action ||
-        !inputData.selectedPrice ||
-        !inputData.selectedPayment ||
-        !inputData.selectedProvince ||
-        !inputData.nameClinic ||
-        !inputData.addressClinic ||
-        !inputData.note
+        checkObj.isValid === false
       ) {
         resolve({
           errCode: 1,
-          errMessage: "Missing required parameters",
+          errMessage: `Missing required parameters: ${checkObj.element}` ,
         });
         console.log;
       } else {
@@ -114,6 +136,9 @@ let saveDetailInfoDoctor = (inputData) => {
           doctorInfo.nameClinic = inputData.nameClinic;
           doctorInfo.addressClinic = inputData.addressClinic;
           doctorInfo.note = inputData.note;
+          doctorInfo.specialtyId = inputData.specialtyId;
+          doctorInfo.clinicId = inputData.clinicId;
+
           await doctorInfo.save();
         } else {
           //create
@@ -125,6 +150,8 @@ let saveDetailInfoDoctor = (inputData) => {
             nameClinic: inputData.nameClinic,
             addressClinic: inputData.addressClinic,
             note: inputData.note,
+            specialtyId: inputData.specialtyId,
+            clinicId: inputData.clinicId,
           });
         }
 
@@ -256,6 +283,8 @@ let bulkCreateSchedule = (data) => {
   });
 };
 
+
+
 let getScheduleByDate = (doctorId, date) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -278,7 +307,7 @@ let getScheduleByDate = (doctorId, date) => {
               model: db.User,
               as: "doctorData",
               attributes: ["firstName", "lastName"],
-            }
+            },
           ],
           raw: false,
           nest: true,
@@ -391,13 +420,13 @@ let getProfileDoctorById = (inputId) => {
               ],
             },
           ],
-          raw:false,
-          nest:true,
+          raw: false,
+          nest: true,
         });
         if (data && data.image) {
           data.image = new Buffer(data.image, "base64").toString("binary");
         }
-        
+
         if (!data) data = {};
 
         resolve({
