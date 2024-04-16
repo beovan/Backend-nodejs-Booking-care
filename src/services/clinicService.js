@@ -36,7 +36,9 @@ let createClinic = (data) => {
 let getAllClinic = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      let data = await db.Clinic.findAll({});
+      let data = await db.Clinic.findAll({
+        
+      });
       if (data && data.length > 0) {
         data.map((item) => {
           item.image = new Buffer(item.image, "base64").toString("binary");
@@ -46,6 +48,7 @@ let getAllClinic = () => {
       resolve({
         errMessage: "ok",
         errCode: 0,
+        data
       });
     } catch (e) {
       reject(e);
@@ -72,7 +75,7 @@ let getDetailClinicById = (inputId) => {
           ],
         });
         if (data) {
-          let doctorClinic = await db.DoctorClinic.findAll({
+          let doctorClinic = await db.Doctor_Infor.findAll({
             where: { clinicId: inputId },
             attributes: ["doctorId", "provinceId"],
           });
