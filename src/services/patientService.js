@@ -38,7 +38,7 @@ let postBookAppointment = (data) => {
         //upsert patient
         let user = await db.User.findOrCreate({
           where: { email: data.email },
-          default: {
+          defaults: {
             email: data.email,
             roleId: "R3",
             gender: data.selectedGender,
@@ -47,7 +47,6 @@ let postBookAppointment = (data) => {
           },
         });
 
-        console.log("user", user[0]);
         //create a bookking record
         if (user && user[0]) {
           await db.Booking.findOrCreate({
