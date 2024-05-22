@@ -2,10 +2,43 @@ import db from "../models/index";
 import emailservice from "./emailService";
 require("dotenv").config();
 import { v4 as uuidv4 } from "uuid";
+import bcrypt from "bcryptjs";
 
 let buildUrlEmail = (doctorId, token) => {
   let result = `${process.env.URL_REACT}/verify-booking?doctorId=${doctorId}&token=${token}`;
   return result;
+};
+
+const salt = bcrypt.genSaltSync(10);
+
+
+let hashUserPassword = (password) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let hashPassword = await bcrypt.hashSync(password, salt);
+      resolve(hashPassword);
+    } catch (err) {
+      reject(err);
+    }
+    resolve(true);
+  });
+};
+
+let checkUserEmail = (userEmail) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let user = await db.User.findOne({
+        where: { email: userEmail },
+      });
+      if (user) {
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
 };
 
 let postBookAppointment = (data) => {
@@ -110,7 +143,56 @@ let postVerifyBookAppointment = (data) => {
     }
   });
 };
+
+
+let createNewPatient = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!data.email || !data.password) {
+        reject({
+          errCode : 1,
+          errMessage: 'empty email or password'
+      });
+    }
+      let check = await checkUserEmail(data.email);
+      if (check === true) {
+        resolve({
+          errCode: 1,
+          errMessage: "Your email is already in used. Please try another email",
+        });
+      }
+      else {
+        let hashPasswordFromBcrypt = await hashUserPassword(data.password);
+      
+        await db.User.create({
+          email: data.email,
+          password: hashPasswordFromBcrypt,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          address: data.address,
+          phonenumber: data.phonenumber,
+          gender: data.gender,
+          roleId: "R3",
+          image: data.image,
+        });
+  
+        resolve({
+          errCode: 0,
+          errMessage: "OK",
+        });
+      }
+
+ 
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+
+
 module.exports = {
   postBookAppointment: postBookAppointment,
   postVerifyBookAppointment: postVerifyBookAppointment,
+  createNewPatient: createNewPatient
 };
