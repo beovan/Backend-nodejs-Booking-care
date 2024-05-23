@@ -148,10 +148,11 @@ let postVerifyBookAppointment = (data) => {
 let createNewPatient = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!data.email || !data.password) {
+      console.log(data);
+      if (!data.email ) {
         reject({
           errCode : 1,
-          errMessage: 'empty email or password'
+          errMessage: 'Email is empty'
       });
     }
       let check = await checkUserEmail(data.email);
@@ -162,8 +163,8 @@ let createNewPatient = (data) => {
         });
       }
       else {
-        let hashPasswordFromBcrypt = await hashUserPassword(data.password);
-      
+        console.log(data);
+        let hashPasswordFromBcrypt = data.password ? await hashUserPassword(data.password) : null;
         await db.User.create({
           email: data.email,
           password: hashPasswordFromBcrypt,
