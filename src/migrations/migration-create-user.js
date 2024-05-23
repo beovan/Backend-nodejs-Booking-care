@@ -38,6 +38,13 @@ module.exports = {
       positionId: {
         type: Sequelize.STRING
       },
+
+      uid: {
+        type: Sequelize.STRING
+      },
+      accessToken: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

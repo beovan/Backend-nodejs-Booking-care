@@ -22,7 +22,14 @@ let handleUserLogin = (email, password) => {
       let isExist = await checkUserEmail(email);
       if (isExist) {
         let user = await db.User.findOne({
-          attributes: ["id","email", "roleId", "password","firstName","lastName"],
+          attributes: [
+            "id",
+            "email",
+            "roleId",
+            "password",
+            "firstName",
+            "lastName",
+          ],
           where: { email: email },
           raw: true,
         });
@@ -48,7 +55,35 @@ let handleUserLogin = (email, password) => {
           "Your email isn't exist in the system. Please try again";
       }
       resolve(userData);
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
 
+//LOGIN GOOGLE
+let handleGoogleLogin = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let userData = {};
+      let user = await db.User.findOne({
+        attributes: ["id", "email", "roleId", "firstName", "lastName"],
+        where: { uid: data.uid },
+        raw: true,
+      });
+      console.log("fdfsdds", data.accessToken === 
+        "ya29.a0AXooCgsviByOsJIbe8u0rKlDXpiJIA4FlvHpCHHATMLr1Pno4Sx5BuXnLqOYa8pQUdXpCS8AmW2F5FwC-m09pr175xaJRKDylYzjWh1KGq1-iX3w9aZ2KlhP-uQxtoBwSQCQqDsFGnrseSyscdVjHFJiygD5RnpcT-kaCgYKAeUSARASFQHGX2MiNweBNWLv4VCGVay3GPkapA0170"
+      );
+      if (user) {
+        userData.errCode = 0;
+        userData.errMessage = "Ok";
+        userData.user = user;
+      } else {
+        userData.errCode = 2;
+        userData.errMessage = `User isn't found in the system`;
+      }
+
+      resolve(userData);
     } catch (e) {
       reject(e);
     }
@@ -107,8 +142,7 @@ let createNewUser = (data) => {
           errCode: 1,
           errMessage: "Your email is already in used. Please try another email",
         });
-      }
-      else {
+      } else {
         let hashPasswordFromBcrypt = await hashUserPassword(data.password);
 
         await db.User.create({
@@ -123,14 +157,12 @@ let createNewUser = (data) => {
           positionId: data.positionId,
           image: data.image,
         });
-  
+
         resolve({
           errCode: 0,
           errMessage: "OK",
         });
       }
-
- 
     } catch (e) {
       reject(e);
     }
@@ -140,7 +172,7 @@ let createNewUser = (data) => {
 let deleteUser = (userId) => {
   return new Promise(async (resolve, reject) => {
     let foundUser = await db.User.findOne({
-      where: { id: userId }
+      where: { id: userId },
     });
     if (!foundUser) {
       resolve({
@@ -163,7 +195,7 @@ let deleteUser = (userId) => {
 let updateUserData = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-  if (!data.id || !data.roleId || !data.positionId || !data.gender) {
+      if (!data.id || !data.roleId || !data.positionId || !data.gender) {
         resolve({
           errCode: 2,
           errMessage: "Missing required parameters",
@@ -171,7 +203,7 @@ let updateUserData = (data) => {
       }
       let user = await db.User.findOne({
         where: { id: data.id },
-        raw: false
+        raw: false,
       });
       if (user) {
         user.firstName = data.firstName;
@@ -190,15 +222,14 @@ let updateUserData = (data) => {
           errCode: 0,
           errMessage: "Update the user succeed!",
         });
-      }
-      else{
+      } else {
         resolve({
           errCode: 1,
           errMessage: "Cannot find this user",
         });
       }
     } catch (e) {
-     reject(e);
+      reject(e);
     }
   });
 };
@@ -223,7 +254,7 @@ let getAllCodeService = (typeInput) => {
       reject(e);
     }
   });
-}
+};
 module.exports = {
   handleUserLogin: handleUserLogin,
   getALLUsers: getALLUsers,
@@ -231,4 +262,5 @@ module.exports = {
   deleteUser: deleteUser,
   updateUserData: updateUserData,
   getAllCodeService: getAllCodeService,
+  handleGoogleLogin: handleGoogleLogin,
 };

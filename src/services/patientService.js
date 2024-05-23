@@ -164,6 +164,8 @@ let createNewPatient = (data) => {
       }
       else {
         console.log(data);
+        console.log(data.uid);
+        console.log(data.accessToken);
         let hashPasswordFromBcrypt = data.password ? await hashUserPassword(data.password) : null;
         await db.User.create({
           email: data.email,
@@ -175,6 +177,8 @@ let createNewPatient = (data) => {
           gender: data.gender,
           roleId: "R3",
           image: data.image,
+          uid: data.uid,
+          accessToken: data.accessToken
         });
   
         resolve({
