@@ -71,9 +71,6 @@ let handleGoogleLogin = (data) => {
         where: { uid: data.uid },
         raw: true,
       });
-      console.log("fdfsdds", data.accessToken === 
-        "ya29.a0AXooCgsviByOsJIbe8u0rKlDXpiJIA4FlvHpCHHATMLr1Pno4Sx5BuXnLqOYa8pQUdXpCS8AmW2F5FwC-m09pr175xaJRKDylYzjWh1KGq1-iX3w9aZ2KlhP-uQxtoBwSQCQqDsFGnrseSyscdVjHFJiygD5RnpcT-kaCgYKAeUSARASFQHGX2MiNweBNWLv4VCGVay3GPkapA0170"
-      );
       if (user) {
         userData.errCode = 0;
         userData.errMessage = "Ok";

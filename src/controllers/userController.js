@@ -7,6 +7,7 @@ let handleLogin = async (req, res) => {
     let uid = req.body.uid;
     // let accessToken = req.body.accessToken;
     // console.log("uidsadf:", uid);
+    console.log("req:", req.body);
     if (!uid ) {
       // If neither uid nor accessToken is provided, it's not a Google login
       if (!email || !password) {
@@ -27,7 +28,6 @@ let handleLogin = async (req, res) => {
       });
     } else {
       // If either uid or accessToken is provided, it's a Google login
-      console.log("uidfsdffffff:", uid);
       let userData = await userService.handleGoogleLogin({
         uid: uid,
         email: email,

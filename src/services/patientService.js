@@ -3,6 +3,7 @@ import emailservice from "./emailService";
 require("dotenv").config();
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcryptjs";
+import userService from "./userService";
 
 let buildUrlEmail = (doctorId, token) => {
   let result = `${process.env.URL_REACT}/verify-booking?doctorId=${doctorId}&token=${token}`;
@@ -161,11 +162,13 @@ let createNewPatient = (data) => {
           errCode: 1,
           errMessage: "Your email is already in used. Please try another email",
         });
+        let islogin = await userService.handleGoogleLogin({
+          uid: user.uid,
+          email: user.email,
+        }); 
+        return islogin;
       }
       else {
-        console.log(data);
-        console.log(data.uid);
-        console.log(data.accessToken);
         let hashPasswordFromBcrypt = data.password ? await hashUserPassword(data.password) : null;
         await db.User.create({
           email: data.email,
