@@ -7,7 +7,7 @@ let handleLogin = async (req, res) => {
     let uid = req.body.uid;
     // let accessToken = req.body.accessToken;
     // console.log("uidsadf:", uid);
-    console.log("req:", req.body);
+    // console.log("req:", req.body);
     if (!uid ) {
       // If neither uid nor accessToken is provided, it's not a Google login
       if (!email || !password) {
