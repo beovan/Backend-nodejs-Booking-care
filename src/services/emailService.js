@@ -111,7 +111,46 @@ let sendAttachment = async (dataSend) => {
     }
   });
 };
+
+let sendForgotPasswordEmail = async (dataSend) => {
+  let transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_APP,
+      pass: process.env.EMAIL_APP_PASSWORD,
+    },
+  });
+
+  let info = await transporter.sendMail({
+    from: '"beovan" <beovan204@gmail.com>',
+    to: dataSend.reciverEmail,
+    subject: "Yêu cầu thay đổi mật khẩu",
+    html: getForgotPasswordEmail(dataSend),
+  });
+};
+
+let getForgotPasswordEmail = (dataSend) => {
+  let result = "";
+  result = `
+    <h3>Xin chào ${dataSend.firstName}!</h3>
+<p> 
+Đã nhận được yêu cầu thay đổi mật khẩu cho tài khoản  của bạn.
+</p>
+<p> Đặt lại mật khẩu Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua.
+</p>
+
+<div>
+dsadas
+</div>
+<div>Xin cảm ơn</div>
+    `;
+  return result;
+};
+
 module.exports = {
   sendSimpleEmail: sendSimpleEmail,
   sendAttachment: sendAttachment,
+  sendForgotPasswordEmail: sendForgotPasswordEmail,
 };

@@ -4,6 +4,8 @@ require("dotenv").config();
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcryptjs";
 import userService from "./userService";
+const jwt = require('jsonwebtoken');
+const User = db.User;
 
 let buildUrlEmail = (doctorId, token) => {
   let result = `${process.env.URL_REACT}/verify-booking?doctorId=${doctorId}&token=${token}`;
@@ -196,11 +198,84 @@ let createNewPatient = (data) => {
     }
   });
 };
+let forgotPassword = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!data.email) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameter",
+        });
+      } else {
+        let user = await db.User.findOne({
+          where: { email: data.email },
+        });
+        console.log(user);
+        if (user) {
+          let accessToken = jwt.sign(
+            { id: user.id },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' } // token will expire in 1 hour
+          );
+          await emailservice.sendForgotPasswordEmail({
+            reciverEmail: data.email,
+            accessToken: accessToken,
+            firstName: user.firstName,
+          });
+          await db.User.update({ accessToken: accessToken }, { where: { id: user.id } });
+          resolve({
+            errCode: 0,
+            errMessage: "OK",
+          });
+        } else {
+          resolve({
+            errCode: 2,
+            errMessage: "Email not found",
+          });
+        }
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
 
-
+let resetPassword = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let user = await db.User.findOne({
+        where: { accessToken: data.token },
+      });
+      if (!user) {
+        resolve({
+          errCode: 1,
+          errMessage: "Invalid token",
+        });
+      } else if (user.resetPasswordExpires < Date.now()) {
+        resolve({
+          errCode: 2,
+          errMessage: "Token has expired",
+        });
+      } else {
+        user.password = data.newPassword; // You should hash the password before saving it
+        user.accessToken = null;
+        user.resetPasswordExpires = null;
+        await user.save();
+        resolve({
+          errCode: 0,
+          errMessage: "Password has been reset",
+        });
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
 
 module.exports = {
   postBookAppointment: postBookAppointment,
   postVerifyBookAppointment: postVerifyBookAppointment,
-  createNewPatient: createNewPatient
+  createNewPatient: createNewPatient,
+  forgotPassword: forgotPassword,
+  resetPassword: resetPassword
 };

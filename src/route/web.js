@@ -53,6 +53,7 @@ let initWebRoutes = (app) => {
 
   //patient
   router.post("/api/create-new-patient", patientController.handleCreateNewPatient);
+  router.post("/api/send-forgot-password", patientController.handleForgotPassword);
 
 
 

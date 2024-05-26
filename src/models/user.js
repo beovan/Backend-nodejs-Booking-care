@@ -46,7 +46,7 @@ module.exports = (sequelize, DataTypes) => {
     roleId: DataTypes.STRING,
     positionId: DataTypes.STRING,
     uid : DataTypes.STRING,
-    accessToken: DataTypes.STRING
+  accessToken: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'User',

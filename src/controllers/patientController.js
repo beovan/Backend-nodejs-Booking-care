@@ -31,15 +31,28 @@ let handleCreateNewPatient = async (req, res) => {
     let message = await patientService.createNewPatient(req.body);
     return res.status(200).json(message);   
   } catch (error) {
+    console.log(error);
     return res.status(200).json({
       errCode: -1,
       errMessage: error.errMessage
     });
   }
- 
+}
+let handleForgotPassword = async (req, res) => {
+  try {
+    let message = await patientService.forgotPassword(req.body);
+    return res.status(200).json(message);
+  } catch (error) {
+    console.log(error);
+    return res.status(200).json({
+      errCode: -1,
+      errMessage: "Error from server",
+    });
+  }
 }
 module.exports = {
     postBookAppointment: postBookAppointment,
     postVerifyBookAppointment: postVerifyBookAppointment,
-    handleCreateNewPatient: handleCreateNewPatient
+    handleCreateNewPatient: handleCreateNewPatient,
+    handleForgotPassword: handleForgotPassword
 }
