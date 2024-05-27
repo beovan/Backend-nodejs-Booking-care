@@ -260,8 +260,9 @@ let forgotPassword = (data) => {
 let resetPassword = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
+      console.log(data);
       let user = await db.User.findOne({
-        where: { accessToken: data.token },
+        where: { accessToken: data.accessToken },
       });
       if (!user) {
         resolve({
@@ -274,10 +275,19 @@ let resetPassword = (data) => {
           errMessage: "Token has expired",
         });
       } else {
-        user.password = data.newPassword; // You should hash the password before saving it
+        if (!data.password) {
+          resolve({
+            errCode: 3,
+            errMessage: "New password is required",
+          });
+          return;
+        }
+        let hashedPassword = await hashUserPassword(data.password);
+
+        user.password = hashedPassword;
         user.accessToken = null;
         user.resetPasswordExpires = null;
-        await user.save();
+        await db.User.update({ password: user.password }, { where: { id: user.id } });
         resolve({
           errCode: 0,
           errMessage: "Password has been reset",
