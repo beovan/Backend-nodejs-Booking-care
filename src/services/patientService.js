@@ -11,6 +11,23 @@ let buildUrlEmail = (doctorId, token) => {
   let result = `${process.env.URL_REACT}/verify-booking?doctorId=${doctorId}&token=${token}`;
   return result;
 };
+let buildUrlEmailResetPassword = (userId, token) => {
+  if (!process.env.URL_REACT) {
+    console.error('URL_REACT environment variable is not set');
+    return;
+  }
+  if (!userId) {
+    console.error('userId is not defined');
+    return;
+  }
+  if (!token) {
+    console.error('token is not defined');
+    return;
+  }
+  let result = `${process.env.URL_REACT}/reset-password?userId=${userId}&token=${token}`;
+  return result;
+};
+
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -210,7 +227,6 @@ let forgotPassword = (data) => {
         let user = await db.User.findOne({
           where: { email: data.email },
         });
-        console.log(user);
         if (user) {
           let accessToken = jwt.sign(
             { id: user.id },
@@ -221,6 +237,7 @@ let forgotPassword = (data) => {
             reciverEmail: data.email,
             accessToken: accessToken,
             firstName: user.firstName,
+            resetUrl: buildUrlEmailResetPassword(user.id, accessToken)
           });
           await db.User.update({ accessToken: accessToken }, { where: { id: user.id } });
           resolve({

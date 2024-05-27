@@ -127,11 +127,11 @@ let sendForgotPasswordEmail = async (dataSend) => {
     from: '"beovan" <beovan204@gmail.com>',
     to: dataSend.reciverEmail,
     subject: "Yêu cầu thay đổi mật khẩu",
-    html: getForgotPasswordEmail(dataSend),
+    html: getForgotPasswordEmail(dataSend, dataSend.resetUrl),
   });
 };
 
-let getForgotPasswordEmail = (dataSend) => {
+let getForgotPasswordEmail = (dataSend, resetUrl) => {
   let result = "";
   result = `
     <h3>Xin chào ${dataSend.firstName}!</h3>
@@ -142,10 +142,11 @@ let getForgotPasswordEmail = (dataSend) => {
 </p>
 
 <div>
-dsadas
+<a href="${resetUrl}">Click here to reset your password</a>
 </div>
 <div>Xin cảm ơn</div>
     `;
+
   return result;
 };
 
