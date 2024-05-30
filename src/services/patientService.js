@@ -189,7 +189,7 @@ let createNewPatient = (data) => {
       }
       else {
         let hashPasswordFromBcrypt = data.password ? await hashUserPassword(data.password) : null;
-        await db.User.create({
+        let newUser =  await db.User.create({
           email: data.email,
           password: hashPasswordFromBcrypt,
           firstName: data.firstName,
@@ -202,10 +202,24 @@ let createNewPatient = (data) => {
           uid: data.uid,
           // accessToken: data.accessToken
         });
-        resolve({
-          errCode: 0,
-          errMessage: "OK",
-        });
+        if (newUser) {
+          let userInfo = newUser.dataValues; // Access the created user data
+          delete userInfo.password;
+          delete userInfo.updatedAt;
+          delete userInfo.createdAt;
+          resolve({
+            errCode: 0,
+            errMessage: "OK",
+            user: userInfo
+          });
+        }
+        else{
+          resolve({
+            errCode: 0,
+            errMessage: "OK",
+          });
+        }
+     
       }
 
  
