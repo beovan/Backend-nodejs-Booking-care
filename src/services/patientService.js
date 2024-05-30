@@ -177,15 +177,15 @@ let createNewPatient = (data) => {
     }
       let check = await checkUserEmail(data.email);
       if (check === true) {
+        let islogin = await userService.handleGoogleLogin({
+          uid: data.uid,
+          email: data.email,
+        }); 
         resolve({
           errCode: 1,
           errMessage: "Your email is already in used. Please try another email",
+          loginResult: islogin
         });
-        let islogin = await userService.handleGoogleLogin({
-          uid: user.uid,
-          email: user.email,
-        }); 
-        return islogin;
       }
       else {
         let hashPasswordFromBcrypt = data.password ? await hashUserPassword(data.password) : null;
@@ -200,9 +200,8 @@ let createNewPatient = (data) => {
           roleId: "R3",
           image: data.image,
           uid: data.uid,
-          accessToken: data.accessToken
+          // accessToken: data.accessToken
         });
-  
         resolve({
           errCode: 0,
           errMessage: "OK",
