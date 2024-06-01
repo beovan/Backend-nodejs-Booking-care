@@ -29,9 +29,16 @@ let handleUserLogin = (email, password) => {
             "password",
             "firstName",
             "lastName",
+            "image"
           ],
           where: { email: email },
           raw: true,
+        });
+        user = user.map(user => {
+          if (user.image) {
+            user.image = Buffer.from(user.image, "base64").toString("binary");
+          }
+          return user;
         });
         if (user) {
           let check = await bcrypt.compareSync(password, user.password);
@@ -67,11 +74,14 @@ let handleGoogleLogin = (data) => {
     try {
       let userData = {};
       let user = await db.User.findOne({
-        attributes: ["id", "email", "roleId", "firstName", "lastName"],
+        attributes: ["id", "email", "roleId", "firstName", "lastName", "image"],
         where: { uid: data.uid },
         raw: true,
       });
       if (user) {
+        if (user.image) {
+          user.image = Buffer.from(user.image, "base64").toString("binary");
+        }
         userData.errCode = 0;
         userData.errMessage = "Ok";
         userData.user = user;
