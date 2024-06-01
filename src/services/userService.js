@@ -34,12 +34,10 @@ let handleUserLogin = (email, password) => {
           where: { email: email },
           raw: true,
         });
-        user = user.map(user => {
-          if (user.image) {
-            user.image = Buffer.from(user.image, "base64").toString("binary");
-          }
-          return user;
-        });
+        console.log(user);
+        if (user.image) {
+          user.image = Buffer.from(user.image, "base64").toString("binary");
+        }
         if (user) {
           let check = await bcrypt.compareSync(password, user.password);
           // let check = true;
