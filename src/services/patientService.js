@@ -79,6 +79,7 @@ let postBookAppointment = (data) => {
         });
       } else {
         let token = uuidv4();
+        console.log(data.doctorName);
         await emailservice.sendSimpleEmail({
           reciverEmail: data.email,
           patientName: data.fullName,
