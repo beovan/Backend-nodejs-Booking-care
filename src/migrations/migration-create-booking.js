@@ -6,7 +6,7 @@ module.exports = {
     // patientID: DataTypes.INTEGER,
     // date: DataTypes.DATE,
     // timeType:DataTypes.STRING
-    await queryInterface.createTable("bookings", {
+    await queryInterface.createTable("Bookings", {
     
       id: {
         allowNull: false,
@@ -17,16 +17,19 @@ module.exports = {
       statusId: {
         type: Sequelize.STRING,
       },
-      doctorID: {
+      doctorId: {
         type: Sequelize.INTEGER,
       },
-      patientID: {
+      patientId: {
         type: Sequelize.INTEGER,
       },
       date: {
-        type: Sequelize.DATE,
+        type: Sequelize.STRING,
       },
       timeType: {
+        type: Sequelize.STRING,
+      },
+      token: {
         type: Sequelize.STRING,
       },
       createdAt: {
@@ -40,6 +43,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable("bookings");
+    await queryInterface.dropTable("Bookings");
   },
 };

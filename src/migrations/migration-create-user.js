@@ -24,7 +24,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       gender: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.STRING
       },
       roleId: {
         type: Sequelize.STRING
@@ -33,9 +33,16 @@ module.exports = {
         type: Sequelize.STRING
       },
       image: {
-        type: Sequelize.STRING
+        type: Sequelize.BLOB('long'),
       },
       positionId: {
+        type: Sequelize.STRING
+      },
+
+      uid: {
+        type: Sequelize.STRING
+      },
+      accessToken: {
         type: Sequelize.STRING
       },
       createdAt: {
