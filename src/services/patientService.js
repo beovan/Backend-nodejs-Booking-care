@@ -79,7 +79,6 @@ let postBookAppointment = (data) => {
         });
       } else {
         let token = uuidv4();
-        console.log(data.doctorName);
         await emailservice.sendSimpleEmail({
           reciverEmail: data.email,
           patientName: data.fullName,
@@ -313,10 +312,37 @@ let resetPassword = (data) => {
   });
 };
 
+
+let getBookingByUserId = async (user) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!user.userId) {
+        console.log(user.userId);
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parametergfdsgfd",
+        });
+      } else {
+        let data = await db.Booking.findOne({
+          where: { patientId: user.userId }
+        });
+        console.log(data);
+        resolve({
+          errCode: 0,
+          data: data,
+        });
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+
+}
 module.exports = {
   postBookAppointment: postBookAppointment,
   postVerifyBookAppointment: postVerifyBookAppointment,
   createNewPatient: createNewPatient,
   forgotPassword: forgotPassword,
-  resetPassword: resetPassword
+  resetPassword: resetPassword,
+  getBookingByUserId: getBookingByUserId
 };

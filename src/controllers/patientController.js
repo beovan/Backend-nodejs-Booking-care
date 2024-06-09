@@ -62,10 +62,24 @@ let handleResetPassword = async (req, res) => {
     });
   }
 }
+let getBookingByUserId = async (req, res) => {
+  try {
+    let message = await patientService.getBookingByUserId({ userId: req.query.userId });
+    console.log('message:', message);
+    return res.status(200).json(message);
+  } catch (error) {
+    console.log(error);
+    return res.status(200).json({
+      errCode: -1,
+      errMessage: "Error from server",
+    });
+  }
+}
 module.exports = {
     postBookAppointment: postBookAppointment,
     postVerifyBookAppointment: postVerifyBookAppointment,
     handleCreateNewPatient: handleCreateNewPatient,
     handleForgotPassword: handleForgotPassword,
-    handleResetPassword: handleResetPassword
+    handleResetPassword: handleResetPassword,
+    getBookingByUserId: getBookingByUserId
 }
