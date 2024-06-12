@@ -58,6 +58,7 @@ let initWebRoutes = (app) => {
   router.get("/api/get-booking-by-user-id", patientController.getBookingByUserId);
   //VNPAY
   router.post("/api/create-payment-url", vnpayController.create_payment_url);
+  router.get("/api/vnpay-return", vnpayController.vnpay_return);
 
   return app.use("/", router);
 };
