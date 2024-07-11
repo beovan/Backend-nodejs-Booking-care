@@ -12,7 +12,7 @@ Công nghệ sử dụng ?
 
 
 
-🐱‍🏍Các câu lệnh mình sử dụng trong video:
+🐱‍🏍Các câu lệnh mình sử dụng:
 👉 1. Cài đặt các thư viện: sequlize-cli, sequelize và mysql2
 npm install --save-dev sequelize-cli@6.2.0
 npm install --save mysql2@2.2.5
