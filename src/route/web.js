@@ -5,8 +5,7 @@ import doctorController from "../controllers/doctorController";
 import patientController from "../controllers/patientController";
 import specialtyController from "../controllers/specialtyController";
 import clinicController from "../controllers/clinicController";
-import {vnpayController}  from "../controllers/VNPayController";
-let router = express.Router();
+import { vnpayController } from '../controllers/VNPayController';let router = express.Router();
 
 let initWebRoutes = (app) => {
   router.get("/", homeController.getHomePage);
@@ -58,7 +57,8 @@ let initWebRoutes = (app) => {
   router.post("/api/reset-password", patientController.handleResetPassword);
   router.get("/api/get-booking-by-user-id", patientController.getBookingByUserId);
   //VNPAY
-  // router.post("/api/create-payment-url", vnpayController.create_payment_url);
+  router.post("/api/create-payment-url", vnpayController.create_payment_url);
+  router.get("/api/vnpay-return", vnpayController.vnpay_return);
 
   return app.use("/", router);
 };

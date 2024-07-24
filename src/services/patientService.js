@@ -317,7 +317,6 @@ let getBookingByUserId = async (user) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!user.userId) {
-        console.log(user.userId);
         resolve({
           errCode: 1,
           errMessage: "Missing required parametergfdsgfd",
@@ -326,7 +325,6 @@ let getBookingByUserId = async (user) => {
         let data = await db.Booking.findOne({
           where: { patientId: user.userId }
         });
-        console.log(data);
         resolve({
           errCode: 0,
           data: data,

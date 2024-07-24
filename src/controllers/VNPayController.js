@@ -1,136 +1,105 @@
-// import { StatusCodes } from 'http-status-codes';
-// import { userService } from '~/services/userService';
-// const moment = require('moment');
+import moment from "moment";
+import { createHmac } from "crypto";
+import qs from "qs";
+import querystring from "querystring";
 
-// function sortObject(obj) {
-//   let sorted = {};
-//   let str = [];
-//   let key;
-//   for (key in obj) {
-//     if (obj.hasOwnProperty(key)) {
-//       str.push(encodeURIComponent(key));
-//     }
-//   }
-//   str.sort();
-//   for (key = 0; key < str.length; key++) {
-//     sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, '+');
-//   }
-//   return sorted;
-// }
+const sortObject = (obj) => {
+  const sorted = {};
+  const str = Object.keys(obj).map(encodeURIComponent).sort();
+  str.forEach((key) => {
+    sorted[key] = encodeURIComponent(obj[key]).replace(/%20/g, "+");
+  });
+  return sorted;
+};
 
-// const create_payment_url = async (req, res) => {
-//   // #swagger.tags = ['vnpay']
-//   // #swagger.summary = 'add'
-//   process.env.TZ = 'Asia/Ho_Chi_Minh';
+const create_payment_url = (req, res) => {
+  const { amount, bankCode, language = "vn" } = req.body;
+  const tmnCode = process.env.VNP_TMN_CODE;
+  const secretKey = process.env.VNP_SECURE_SECRET;
+  const vnpUrl = process.env.VNPAY_URL;
+  const returnUrl = process.env.VNP_RETURN_URL;
+  const createDate = moment().format("YYYYMMDDHHmmss");
+  const orderId = moment().format("DDHHmmss");
+  const ipAddr = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
 
-//   let date = new Date();
-//   let createDate = moment(date).format('YYYYMMDDHHmmss');
+  const vnp_Params = {
+    vnp_Version: "2.1.0",
+    vnp_Command: "pay",
+    vnp_TmnCode: tmnCode,
+    vnp_Locale: language,
+    vnp_CurrCode: "VND",
+    vnp_TxnRef: orderId,
+    vnp_OrderInfo: `Thanh toan maGD:${orderId}`,
+    vnp_OrderType: "Update Pro",
+    vnp_Amount: amount * 100,
+    vnp_ReturnUrl: returnUrl,
+    vnp_IpAddr: ipAddr,
+    vnp_CreateDate: createDate,
+    ...(bankCode && { vnp_BankCode: bankCode }),
+  };
 
-//   let ipAddr =
-//     req.headers['x-forwarded-for'] ||
-//     req.connection.remoteAddress ||
-//     req.socket.remoteAddress ||
-//     req.connection.socket.remoteAddress;
+  const sortedParams = sortObject(vnp_Params);
+  const signData = qs.stringify(sortedParams, { encode: false });
+  const hmac = createHmac("sha512", secretKey);
+  const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
+  sortedParams.vnp_SecureHash = signed;
 
-//   let tmnCode = process.env.VNP_TMN_CODE;
-//   let secretKey = process.env.VNP_SECURE_SECRET;
-//   let vnpUrl = process.env;
-//   let returnUrl = process.env.VNP_RETURN_URL;
+  res.set("Content-Type", "text/html");
+  res.send(
+    JSON.stringify({
+      errCode: 0,
+      data: `${vnpUrl}?${qs.stringify(sortedParams, { encode: false })}`,
+    })
+  );
+};
 
-//   let orderId = req.body.orderId;
-//   let amount = req.body.amount;
+const vnpay_return = (req, res) => {
+  const { day: defaultDay = 30 } = req.body;
+  const vnp_Params = req.query;
+  const secureHash = vnp_Params.vnp_SecureHash;
+  const gia = vnp_Params.vnp_Amount;
 
-//   let bankCode = '';
+  delete vnp_Params.vnp_SecureHash;
+  delete vnp_Params.vnp_SecureHashType;
 
-//   let locale = '';
-//   if (locale === null || locale === '') {
-//     locale = 'vn';
-//   }
-//   let currCode = 'VND';
-//   let vnp_Params = {};
-//   vnp_Params['vnp_Version'] = '2.1.0';
-//   vnp_Params['vnp_Command'] = 'pay';
-//   vnp_Params['vnp_TmnCode'] = tmnCode;
-//   vnp_Params['vnp_Locale'] = locale;
-//   vnp_Params['vnp_CurrCode'] = currCode;
-//   vnp_Params['vnp_TxnRef'] = orderId;
-//   vnp_Params['vnp_OrderInfo'] = 'Thanh toan maGD:' + orderId;
-//   vnp_Params['vnp_OrderType'] = 'Update Pro';
-//   vnp_Params['vnp_Amount'] = amount * 100;
-//   vnp_Params['vnp_ReturnUrl'] = returnUrl;
-//   vnp_Params['vnp_IpAddr'] = ipAddr;
-//   vnp_Params['vnp_CreateDate'] = createDate;
-//   if (bankCode !== null && bankCode !== '') {
-//     vnp_Params['vnp_BankCode'] = bankCode;
-//   }
-//   vnp_Params = sortObject(vnp_Params);
-//   let querystring = require('qs');
-//   let signData = querystring.stringify(vnp_Params, { encode: false });
-//   let crypto = require('crypto');
-//   let hmac = crypto.createHmac('sha512', secretKey);
-//   let signed = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
-//   vnp_Params['vnp_SecureHash'] = signed;
-//   vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
-//   res.set('Content-Type', 'text/html');
-//   res.send(JSON.stringify(vnpUrl));
-// };
+  const sortedParams = sortObject(vnp_Params);
 
-// const vnpay_return = async (req, res) => {
-//   // #swagger.tags = ['vnpay']
-//   // #swagger.summary = 'check'
-//   let { day = 30 } = req.body;
-//   let vnp_Params = req.query;
+  const secretKey = process.env.VNP_SECURE_SECRET;
+  const signData = querystring.stringify(sortedParams, { encode: false });
 
-//   let secureHash = vnp_Params['vnp_SecureHash'];
-//   let gia = vnp_Params['vnp_Amount'];
-//   let hash = secureHash;
+  const hmac = createHmac("sha512", secretKey);
+  const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
+  console.log("secureHash", secureHash === signed);
+  if (secureHash === signed) {
+    const responseCode = sortedParams.vnp_ResponseCode;
+    if (responseCode === "00") {
+      const daysMap = {
+        50000000: 180,
+        100000000: 365,
+      };
 
-//   delete vnp_Params['vnp_SecureHash'];
-//   delete vnp_Params['vnp_SecureHashType'];
+      const day = daysMap[gia] || defaultDay;
 
-//   vnp_Params = sortObject(vnp_Params);
+      res.send(JSON.stringify({ success: true, mgs: "Thanh toán thành công" }));
+    } else {
+      res.send(
+        JSON.stringify({
+          success: false,
+          code: responseCode,
+          redirectUrl: URL_REACT,
+        })
+      );
+    }
+  } else {
+    res.redirect(process.env.URL_REACT)
+    // res.send(
+    //   JSON.stringify({ success: false, code: "97", redirectUrl: process.env.URL_REACT })
+    // );
+    
+  }
+};
 
-//   let secretKey = 'DENHJRMJZSHXENEAWJVJWBBENOMZAXST';
-//   let querystring = require('qs');
-//   let signData = querystring.stringify(vnp_Params, { encode: false });
-//   let crypto = require('crypto');
-//   let hmac = crypto.createHmac('sha512', secretKey);
-//   let signed = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
-
-//   if (secureHash === signed) {
-//     const responseCode = vnp_Params['vnp_ResponseCode'];
-//     if (responseCode == '00') {
-//       const user = await userService.getUserByIdCheckSecureHash(
-//         req.userId || req.userIdPro,
-//         hash
-//       );
-//       if (user === '00') {
-//         if (gia == 50000000) {
-//           day = 180;
-//         }
-//         if (gia == 100000000) {
-//           day = 365;
-//         }
-//         const updatePro = await userService.updateUserPro(
-//           req.userId || req.userIdPro,
-//           Number(day)
-//         );
-//         res.send(
-//           JSON.stringify({ success: true, mgs: 'Thanh toán thành công' })
-//         );
-//         return;
-//       } else {
-//         res.send(JSON.stringify({ success: false, code: '99' }));
-//         return;
-//       }
-//     } else {
-//       res.send(JSON.stringify({ success: false, code: responseCode }));
-//     }
-//   } else {
-//     res.send(JSON.stringify({ success: false, code: '97' }));
-//   }
-// };
-// export const vnpayController = {
-//   create_payment_url,
-//   vnpay_return,
-// };
+export const vnpayController = {
+  create_payment_url,
+  vnpay_return,
+};
